@@ -118,28 +118,51 @@ var _ = { };
   // iterator(previousValue, item) for each item. previousValue should be
   // the return value of the previous iterator call.
   _.reduce = function(collection, iterator, initialValue) {
-    var newSum = 0;
-    if (initialValue === true) {
-      newSum = 0 + initialValue;
+    if (initialValue === undefined) {
+    	initialValue = 0;
     }
-      for (var i = 0; i < collection.length; i++) {
-        newSum = newSum + i;
-      }
-      return newSum;
+  	for (var i in collection) {
+  		initialValue = iterator(collection[i], initialValue);
+  	}
+  	return initialValue;
   };
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
+    for (var i in collection) {
+      if (collection[i] === target) {
+        return true;
+      }
+    }
+    return false;
   };
 
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
+    if (!iterator) {
+  		iterator = Boolean;
+  	}
+  	for (var i = 0; i < collection.length; i++) {
+  		if (!iterator(collection[i])) {
+  			return false;
+  		}
+  	}
+  	return true;
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
+    if (!iterator) {
+  		iterator = Boolean;
+  	}
+  	for (var i = 0; i < collection.length; i++) {
+  		if (iterator(collection[i])) {
+  			return true;
+  		}
+  	}
+  	return false;
   };
 
 
@@ -153,11 +176,33 @@ var _ = { };
   // Extend a given object with all the properties of the passed in
   // object(s).
   _.extend = function(obj) {
+      var objectList = [];
+      for (var i = 1; i < arguments.length; i++) {
+        objectList.push(arguments[i]);
+      }
+      objectList.forEach(function(currentObj) {
+        for (var k in currentObj) {
+          obj[k] = currentObj[k];
+        }
+      });
+      return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var objectList = [];
+    for (var i = 1; i < arguments.length; i++) {
+      objectList.push(arguments[i]);
+    }
+    objectList.forEach(function(currentObj) {
+      for (var k in currentObj) {
+        if (!obj.hasOwnProperty(k)){
+          obj[k] = currentObj[k];
+        }
+      }
+    });
+    return obj;
   };
 
 
@@ -169,6 +214,17 @@ var _ = { };
   // Return a function that can be called at most one time. Subsequent calls
   // should return the previously returned value.
   _.once = function(func) {
+    var invoked = false;
+    var value;
+    return function() {
+      if (invoked) {
+        return value;
+      }
+      else {
+        invoked = true;
+        return value = func();
+      }
+    }
   };
 
   // Memoize an expensive function by storing its results. You may assume
@@ -178,6 +234,15 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var result = {};
+    return function(arg) {
+      if (result[arg]) {
+        return result[arg];
+      }
+      else {
+        return result[arg] = func(arg);
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -187,6 +252,7 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    
   };
 
 

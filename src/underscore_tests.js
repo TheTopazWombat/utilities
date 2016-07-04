@@ -16,7 +16,7 @@ var _ = { };
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-    if (n === undefined) {
+    if (!n) {
     	return array[0];
     }
    return array.slice(0, n);
@@ -224,7 +224,7 @@ var _ = { };
         invoked = true;
         return value = func();
       }
-    }
+    };
   };
 
   // Memoize an expensive function by storing its results. You may assume
@@ -252,13 +252,27 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-    
+    var argsList = [];
+    for (var i = 2; i < arguments.length; i++) {
+      argsList.push(arguments[i]);
+      }
+    return setTimeout(function() {
+      func.apply(null, argsList);
+    }, wait);
   };
 
 
 
   // Shuffle an array.
   _.shuffle = function(array) {
+    var i = array.length, temp, rando, newArray = [];
+    while (--i > 0) {
+      rando = Math.floor(Math.random() * (i+10));
+      temp = array[rando];
+      array[rando] = array[i];
+      array[i] = temp;
+    }
+    return newArray;
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -266,6 +280,48 @@ var _ = { };
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if (typeof(iterator) === 'string') {
+      var tArg = iterator;
+      iterator = function(obj) {
+        return obj[tArg];
+      };
+    }
+    //If iterator is a string, assign that string as an object that the new iterator
+    //function will then look for in the collection
+
+    var unSortable = [];
+
+    function sorter() {
+      var sortFlag = false;
+
+      for (var i = 0; i < collection.length-1; i++) {
+
+        if (iterator(collection[i]) === undefined) {
+          unSortable.push(collection[i]);
+          collection.splice(i, 1);
+        }
+        else if ((iterator(collection[i])) <= iterator(collection[i+1])) {
+          continue;
+        }
+        else {
+          sortFlag = true;
+          var store = collection[i+1];
+          collection[i+1] = collection[i];
+          collection[i] = store;
+        }
+      }
+      // For every time you have to make a swap, call the function one additional
+      // time, pausing the current loop to call sort again. This is done because
+      // the first loop through will not sort everything without the extra function call.
+      //
+      if(sortFlag) { return sorter(); }
+    }
+
+    sorter();
+    unSortable.forEach(function(x) {
+      collection.push(x);
+    });
+    return collection;
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -279,6 +335,19 @@ var _ = { };
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
   _.flatten = function(nestedArray, result) {
+    var newArr = [];
+    function squish(array) {
+      for (var i = 0; i < array.length; i++) {
+        if (Array.isArray(array[i])) {
+          squish(array[i]);
+        }
+        else {
+          newArr.push(array[i]);
+        }
+      }
+    }
+    squish(nestedArray);
+    return newArr;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains

@@ -111,8 +111,16 @@ var _ = { };
 
   // Calls the method named by methodName on each value in the list.
   _.invoke = function(list, methodName, args) {
-
-    };
+    for (var i = 0, item; i < list.length; i++) {
+      item = list[i];
+      if (typeof(methodName) === "string") {
+        item[methodName](args);
+      } else {
+        methodName.call(item, args);
+      }
+    }
+    return list;
+  };
 
   // Reduces an array or object to a single value by repetitively calling
   // iterator(previousValue, item) for each item. previousValue should be
@@ -330,6 +338,7 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -353,6 +362,7 @@ var _ = { };
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+
   };
 
   // Take the difference between one array and a number of other arrays.
